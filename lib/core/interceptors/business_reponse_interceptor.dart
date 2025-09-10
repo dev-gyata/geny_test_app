@@ -4,11 +4,14 @@ import 'package:flutter/services.dart' show rootBundle;
 
 class BusinessReponseInterceptor extends Interceptor {
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+  Future<void> onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     // check if request has a path of /businesses
     if (options.path.contains('/businesses')) {
       // read business data from assets
-      final businessData = loadBuinessData();
+      final businessData = await loadBuinessData();
       // response with json data
       return handler.resolve(
         Response(
@@ -21,10 +24,12 @@ class BusinessReponseInterceptor extends Interceptor {
     handler.next(options);
   }
 
-  Future<List<Map<String, dynamic>>> loadBuinessData() async {
+  Future<List<dynamic>> loadBuinessData() async {
     // Load the JSON file as a string from the assets
-    final jsonString = await rootBundle.loadString('assets/business_data.json');
+    final jsonString = await rootBundle.loadString(
+      'assets/data/business_data.json',
+    );
     // Decode the JSON string into a Dart Map
-    return jsonDecode(jsonString) as List<Map<String, dynamic>>;
+    return jsonDecode(jsonString) as List<dynamic>;
   }
 }
