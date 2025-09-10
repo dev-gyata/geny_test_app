@@ -13,8 +13,10 @@ class LocalBusinessRepositoryImpl implements BusinessRepository {
 
   @override
   Future<List<BusinessModel>> getBusinesses() async {
-    final response = await _dio.get<List<Map<String, dynamic>>>('/businesses');
-    final businesses = response.data?.map(BusinessModel.fromMap).toList();
+    final response = await _dio.get<List<dynamic>>('/businesses');
+    final businesses = response.data
+        ?.map((e) => BusinessModel.fromMap(e as Map<String, dynamic>))
+        .toList();
     return businesses ?? [];
   }
 }
