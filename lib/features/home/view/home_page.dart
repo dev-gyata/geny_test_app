@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:geny_test_app/core/config/constants.dart';
 import 'package:geny_test_app/core/injector/di.dart';
 import 'package:geny_test_app/core/widgets/retry_widget.dart';
 import 'package:geny_test_app/features/home/notifiers/business_notifier.dart';
@@ -17,7 +18,7 @@ class HomePage extends StatelessWidget {
           BusinessNotifier(businessRepository: getIt())..fetchBusinesses(),
       child: Scaffold(
         appBar: AppBar(
-          title: const Text('Geny'),
+          title: const Text(AppConstants.appName),
         ),
         body: Consumer<BusinessNotifier>(
           builder: (context, businessNotifier, _) {
