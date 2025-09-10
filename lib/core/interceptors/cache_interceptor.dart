@@ -50,4 +50,12 @@ class CacheInterceptor extends Interceptor {
     }
     handler.next(err);
   }
+
+  void addToCache(CacheEntry entry) {
+    _cache[entry.response.requestOptions.uri.toString()] = entry;
+  }
+
+  void clearCache() {
+    _cache.clear();
+  }
 }
