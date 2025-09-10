@@ -10,10 +10,23 @@ class BusinessModel extends Equatable {
   });
 
   factory BusinessModel.fromMap(Map<String, dynamic> map) {
+    final name = map['biz_name']?.toString().trim();
+    final location = map['bss_location']?.toString().trim();
+    final contactNumber = map['contct_no']?.toString().trim();
+
+    if (name == null || name.isEmpty) {
+      throw ArgumentError('Invalid business name');
+    }
+    if (location == null || location.isEmpty) {
+      throw ArgumentError('Invalid business location');
+    }
+    if (contactNumber == null || !_isValidPhone(contactNumber)) {
+      throw ArgumentError('Invalid contact number');
+    }
     return BusinessModel(
-      name: (map['name'] ?? '') as String,
-      location: (map['location'] ?? '') as String,
-      phone: (map['phone'] ?? '') as String,
+      name: name,
+      location: location,
+      phone: contactNumber,
     );
   }
 
@@ -41,6 +54,11 @@ class BusinessModel extends Equatable {
       'location': location,
       'phone': phone,
     };
+  }
+
+  static bool _isValidPhone(String phone) {
+    final phoneRegExp = RegExp(r'^\+?[0-9\s-]+$');
+    return phoneRegExp.hasMatch(phone);
   }
 
   String toJson() => json.encode(toMap());
