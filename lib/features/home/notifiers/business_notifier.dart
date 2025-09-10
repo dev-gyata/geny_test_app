@@ -18,8 +18,9 @@ class BusinessNotifier extends ChangeNotifier {
       _state = const ItemFetcherModel.loading();
       final businessesResponse = await _businessRepository.getBusinesses();
       _state = ItemFetcherModel.success(businessesResponse);
-    } catch (e) {
-      _state = ItemFetcherModel.failed(e.toString());
+    } catch (e, st) {
+      _state = ItemFetcherModel.failed(e.toString(), st);
     }
+    notifyListeners();
   }
 }
