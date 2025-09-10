@@ -20,7 +20,7 @@ This app uses a modular architecture for maintainability and scalability:
 - **State Management**: Could adopt a more robust solution (e.g., Bloc, Riverpod) for larger scale.
 - **Error Handling**: Expand error handling/reporting, especially for network and platform-specific issues.
 - **CI/CD**: Integrate automated testing and deployment pipelines.
-- **Performance**: Profile and optimize for startup time and memory usage.
+- **Caching**: Could have used a different storage mechanism for caching making it more persistent.
 - **Documentation**: Add more detailed developer and API docs.
 - **Models**: Could have gone for a more robust for data models like freezed.
 - **Code Generation**: Could have removed generated code to make it easier to maintain.
