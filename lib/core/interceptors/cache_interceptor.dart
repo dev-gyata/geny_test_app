@@ -7,25 +7,44 @@ class CacheEntry {
   final Response<dynamic> response;
 }
 
-class CacheInterceptor extends Interceptor {
-  CacheInterceptor({Duration? maxAge})
-    : _maxAge = maxAge ?? AppConstants.cacheMaxAge;
+abstract class CacheStorage {
+  Future<void> add(String key, CacheEntry value);
 
-  final Map<String, CacheEntry> _cache = {};
+  Future<void> remove(String key);
+
+  Future<CacheEntry?> get(String key);
+
+  Future<bool> exists(String key);
+
+  Future<void> clearCache();
+}
+
+class CacheInterceptor extends Interceptor {
+  CacheInterceptor({
+    required CacheStorage cacheStorage,
+    Duration? maxAge,
+  }) : _cacheStorage = cacheStorage,
+       _maxAge = maxAge ?? AppConstants.cacheMaxAge;
+
+  final CacheStorage _cacheStorage;
+
   final Duration _maxAge;
 
   @override
-  void onRequest(RequestOptions options, RequestInterceptorHandler handler) {
+  Future<void> onRequest(
+    RequestOptions options,
+    RequestInterceptorHandler handler,
+  ) async {
     final cacheKey = options.uri;
     if (options.method.toUpperCase() == 'GET' &&
-        _cache.containsKey(cacheKey.toString())) {
-      final entry = _cache[cacheKey.toString()]!;
-      final isExpired = DateTime.now().difference(entry.createdAt) > _maxAge;
+        await _cacheStorage.exists(cacheKey.toString())) {
+      final entry = await _cacheStorage.get(cacheKey.toString());
+      final isExpired = DateTime.now().difference(entry!.createdAt) > _maxAge;
 
       if (!isExpired) {
         return handler.resolve(entry.response);
       } else {
-        _cache.remove(cacheKey.toString());
+        await _cacheStorage.remove(cacheKey.toString());
       }
     }
     handler.next(options);
@@ -37,25 +56,34 @@ class CacheInterceptor extends Interceptor {
     ResponseInterceptorHandler handler,
   ) {
     if (response.requestOptions.method.toUpperCase() == 'GET') {
-      _cache[response.requestOptions.uri.toString()] = CacheEntry(response);
+      _cacheStorage.add(
+        response.requestOptions.uri.toString(),
+        CacheEntry(response),
+      );
     }
     handler.next(response);
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
+  Future<void> onError(
+    DioException err,
+    ErrorInterceptorHandler handler,
+  ) async {
     final cacheKey = err.requestOptions.uri.toString();
-    if (_cache.containsKey(cacheKey)) {
-      return handler.resolve(_cache[cacheKey]!.response);
+    if (await _cacheStorage.exists(cacheKey)) {
+      return handler.resolve((await _cacheStorage.get(cacheKey))!.response);
     }
     handler.next(err);
   }
 
-  void addToCache(CacheEntry entry) {
-    _cache[entry.response.requestOptions.uri.toString()] = entry;
+  Future<void> addToCache(CacheEntry entry) async {
+    return _cacheStorage.add(
+      entry.response.requestOptions.uri.toString(),
+      entry,
+    );
   }
 
-  void clearCache() {
-    _cache.clear();
+  Future<void> clearCache() async {
+    return _cacheStorage.clearCache();
   }
 }
