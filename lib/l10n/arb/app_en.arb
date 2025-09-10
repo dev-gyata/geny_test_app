@@ -1,7 +1,6 @@
 {
     "@@locale": "en",
-    "counterAppBarTitle": "Counter",
-    "@counterAppBarTitle": {
-        "description": "Text shown in the AppBar of the Counter Page"
-    }
+    "somethingWentWrong": "Something went wrong",
+    "clickHereToRetry": "Click here to retry",
+    "emptyBusinessList": "No businesses found"
 }
